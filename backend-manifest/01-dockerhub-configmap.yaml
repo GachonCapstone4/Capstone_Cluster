@@ -1,0 +1,9 @@
+# 01-dockerhub-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dockerhub-configmap
+  namespace: backend
+data:
+  IMAGE: "suhannugul/email-agent:latest"
+  REGISTRY: "https://index.docker.io/v1/"
