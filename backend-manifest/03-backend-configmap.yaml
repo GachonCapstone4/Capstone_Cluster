@@ -12,4 +12,4 @@ data:
   SSE_POD_0_URL: "http://localhost:8080"
   SSE_POD_1_URL: "http://localhost:8081"
   GOOGLE_REDIRECT_URI: "https://capstone.studylink.click/api/integrations/google/callback"
-  APP_FRONTEND_BASE_URL: "https://capstone.studylink.click"
+
