@@ -11,4 +11,4 @@ data:
   AI_SERVER_URL: "http://localhost:8000"
   SSE_POD_0_URL: "http://localhost:8080"
   SSE_POD_1_URL: "http://localhost:8081"
-  GOOGLE_REDIRECT_URI: "http://localhost:8080/api/integrations/google/callback"
+  GOOGLE_REDIRECT_URI: "https://capstone.studylink.click/api/integrations/google/callback"
