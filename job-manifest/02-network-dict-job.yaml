@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: diag-network
+spec:
+  ttlSecondsAfterFinished: 100
+  completions: 3
+  parallelism: 3
+  template:
+    metadata:
+      labels:
+        job-name: diag-network
+    spec:
+      hostNetwork: true
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  job-name: diag-network
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: diag-tool
+          image: suhannugul/capstonetest:latest
+          args: [ "network" ]
+          env:
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          envFrom:
+            - configMapRef:
+                name: job-configmap
+            - secretRef:
+                name: job-secret
+          securityContext:
+            capabilities:
+              add: [ "NET_RAW" ]
+      restartPolicy: Never

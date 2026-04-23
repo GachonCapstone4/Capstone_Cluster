@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: job-configmap
+  namespace: job
+data:
+  RABBITMQ_HOST: "192.168.2.20"
+  RABBITMQ_PORT: "30672"
+  controlplane: "192.168.2.10"
+  workernode-1: "192.168.2.20"
+  workernode-2: "192.168.2.30"
+  GATEWAY_IP: "192.168.2.1"

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sse-deployment
-  namespace: sse-deployment
+  namespace: sse
 spec:
   replicas: 2
   selector:
@@ -14,7 +14,7 @@ spec:
         app: sse
     spec:
       containers:
-        - name: sse
+        - name: sse-pod
           image: suhannugul/capstonesse:latest
           ports:
             - containerPort: 8080
