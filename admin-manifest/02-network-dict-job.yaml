@@ -11,13 +11,13 @@ spec:
   manualSelector: true
   selector:
     matchLabels:
-      job-name: network-check
+      job-name: diag-network
   completions: 3
   parallelism: 3
   template:
     metadata:
       labels:
-        job-name: network-check
+        job-name: diag-network
     spec:
       hostNetwork: true
       tolerations:
@@ -40,8 +40,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
-            - name: RUN_ID
-              value: "2025-04-24T10:00:00"  # annotation과 동일값
           envFrom:
             - configMapRef:
                 name: job-configmap
