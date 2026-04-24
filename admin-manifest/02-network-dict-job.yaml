@@ -6,8 +6,7 @@ metadata:
   annotations:
     run-id: "2025-04-24T10:00:00"
     argocd.argoproj.io/sync-options: "Replace=true"
-    # 완료된 Job을 ArgoCD가 계속 비교하지 않도록
-    argocd.argoproj.io/compare-options: "IgnoreExtraneous"
+
 
 
 spec:
