@@ -4,10 +4,10 @@ metadata:
   name: diag-network
   namespace: admin
   annotations:
-    run-id: "testtime6"
-    argocd.argoproj.io/sync-options: "Force=true"
+    argocd.argoproj.io/sync-options: "Prune=false"
 
 spec:
+  ttlSecondsAfterFinished: 100
   completions: 3
   parallelism: 3
   template:
