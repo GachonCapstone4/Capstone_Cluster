@@ -6,6 +6,8 @@ metadata:
   annotations:
     # Sync(동기화)가 발생할 때만 실행되도록 설정
     argocd.argoproj.io/hook: Sync
+    # 관리자 서버에서 sync를 주기위한 변수값
+    inspection-id: "REPLACE_THIS_VALUE"
 spec:
   ttlSecondsAfterFinished: 100
   completions: 3
