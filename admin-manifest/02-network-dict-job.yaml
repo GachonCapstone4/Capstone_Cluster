@@ -11,13 +11,13 @@ spec:
   manualSelector: true
   selector:
     matchLabels:
-      job-name: diag-network
+      job-name: network-check
   completions: 3
   parallelism: 3
   template:
     metadata:
       labels:
-        job-name: diag-network
+        job-name: network-check
     spec:
       hostNetwork: true
       tolerations:
