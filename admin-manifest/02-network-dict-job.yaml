@@ -4,7 +4,7 @@ metadata:
   name: diag-network
   namespace: admin
   annotations:
-    run-id: "testtime3"
+    run-id: "testtime4"
     argocd.argoproj.io/sync-options: "Replace=true"
 
 spec:
