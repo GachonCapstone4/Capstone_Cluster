@@ -3,6 +3,9 @@ kind: Job
 metadata:
   name: diag-network
   namespace: admin
+  annotations:
+    # Sync(동기화)가 발생할 때만 실행되도록 설정
+    argocd.argoproj.io/hook: Sync
 spec:
   ttlSecondsAfterFinished: 100
   completions: 3
