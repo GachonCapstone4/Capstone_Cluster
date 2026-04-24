@@ -6,4 +6,4 @@ metadata:
   namespace: admin
 data:
   # 자바 서버가 버튼 누를 때마다 이 ID만 업데이트해서 Push
-  inspection-id: "20260424-001"
+  inspection-id: "20260424-002"
