@@ -8,7 +8,7 @@ metadata:
     argocd.argoproj.io/hook: Sync
     # 새 job 실행전 기존의 job 삭제
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-    # 관리자 서버에서 sync를 주기위한 변수값
+    # 관리자 서버에서 sync를 주기위한 변수값임
     inspection-id: "REPLACE_THIS_VALUE"
 spec:
   ttlSecondsAfterFinished: 100
