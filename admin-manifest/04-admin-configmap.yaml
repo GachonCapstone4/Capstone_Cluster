@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admin-configmap
+  namespace: admin
+data:
+  RABBITMQ_HOST: "rabbitmq-headless.rabbitmq"
+  RABBITMQ_PORT: "5672"
+  DB_HOST: "192.168.3.10"
+  DB_PORT: "3306"
+  AI_SERVER_URL: "http://localhost:8000"
+  SSE_POD_0_URL: "http://localhost:8080"
+  SSE_POD_1_URL: "http://localhost:8081"
+  GOOGLE_REDIRECT_URI: "https://capstone.studylink.click/api/integrations/google/callback"
