@@ -8,10 +8,6 @@ metadata:
     argocd.argoproj.io/sync-options: "Replace=true"
 
 spec:
-  manualSelector: true
-  selector:
-    matchLabels:
-      job-name: diag-network
   completions: 3
   parallelism: 3
   template:
