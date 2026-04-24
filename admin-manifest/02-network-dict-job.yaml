@@ -5,7 +5,7 @@ metadata:
   namespace: admin
   annotations:
     run-id: "testtime5"
-    argocd.argoproj.io/sync-options: "Replace=true"
+    argocd.argoproj.io/sync-options: "Force=true"
 
 spec:
   completions: 3
