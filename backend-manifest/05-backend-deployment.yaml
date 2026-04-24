@@ -4,6 +4,7 @@ metadata:
   name: backend
   namespace: backend
 spec:
+  revisionHistoryLimit: 5
   replicas: 2
   selector:
     matchLabels:
@@ -15,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: suhannugul/email-agent:f9683b0a9dd4e44f10c49a194a22df657a6d3cf8
+          image: suhannugul/email-agent:latest
           ports:
             - containerPort: 8080
           resources:
