@@ -4,10 +4,11 @@ metadata:
   name: diag-network
   namespace: admin
   annotations:
-    # Sync(동기화)가 발생할 때만 실행되도록 설정
-    argocd.argoproj.io/hook: Sync
-    # 새 job 실행전 기존의 job 삭제
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    run-id: "2025-04-24T10:00:00"
+    argocd.argoproj.io/sync-options: "Replace=true"
+    # 완료된 Job을 ArgoCD가 계속 비교하지 않도록
+    argocd.argoproj.io/compare-options: "IgnoreExtraneous"
+
 
 spec:
   ttlSecondsAfterFinished: 100
@@ -39,11 +40,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
+            - name: RUN_ID
+              value: "2025-04-24T10:00:00"  # annotation과 동일값
           envFrom:
             - configMapRef:
                 name: job-configmap
-            - configMapRef:
-                name: diag-network-trigger
             - secretRef:
                 name: job-secret
           securityContext:
