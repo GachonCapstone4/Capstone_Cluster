@@ -26,6 +26,6 @@ spec:
               memory: "512Mi"
           envFrom:
             - secretRef:
-                name: backend-secret
+                name: rag-secret
             - configMapRef:
-                name: backend-configmap
+                name: rag-configmap
