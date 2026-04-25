@@ -1,0 +1,21 @@
+# role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: job-runner-role
+  namespace: admin
+rules:
+  # Job 생성 / 조회 / 삭제 (필수)
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "get", "list", "watch", "delete", "patch"]
+
+  # Job 상태 확인을 위한 Pod 조회 (추가옵션)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+
+  # Pod 로그 조회 (추가옵션)
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]

@@ -1,0 +1,14 @@
+# rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: job-runner-binding
+  namespace: admin
+subjects:
+  - kind: ServiceAccount
+    name: job-runner-sa
+    namespace: admin
+roleRef:
+  kind: Role
+  name: job-runner-role
+  apiGroup: rbac.authorization.k8s.io

@@ -14,6 +14,8 @@ spec:
       labels:
         app: admin
     spec:
+      serviceAccountName: job-runner-sa
+      automountServiceAccountToken: true
       containers:
         - name: backend
           image: suhannugul/capstoneadmin:latest
