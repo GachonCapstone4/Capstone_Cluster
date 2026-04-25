@@ -17,7 +17,7 @@ spec:
       serviceAccountName: job-runner-sa
       automountServiceAccountToken: true
       containers:
-        - name: backend
+        - name: admin
           image: suhannugul/capstoneadmin:latest
           ports:
             - containerPort: 8080
