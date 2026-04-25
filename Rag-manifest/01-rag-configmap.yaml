@@ -1,12 +1,52 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: title
+  name: rag-config
 data:
-  # kv format
-  key: "value"
-  $actual-config-file$: "name.properties"
+  # 서버
+  RAG_ENV: "production"
+  RAG_HOST: "0.0.0.0"
+  RAG_PORT: "8090"
+  MOCK_MODE: "false"
 
-  # file format
-  name.properties: |
-    field=value1,value2
+  # LLM
+  LLM_API_BASE_URL: "http://cellm.gachon.ac.kr:8000/v1"
+  LLM_CHAT_MODEL: "text"
+  LLM_API_TIMEOUT_SECONDS: "60"
+
+  # Embedding
+  EMBEDDING_API_BASE_URL: "https://api.anthropic.com/v1/messages"
+  EMBEDDING_MODEL: "text-embedding-3-small"
+  EMBEDDING_BACKEND: "embedding_api"
+  EMBEDDING_DIMENSIONS: "384"
+
+  # VectorDB (ChromaDB HTTP 모드 필수)
+  VECTOR_BACKEND: "chroma_http"
+  CHROMA_HOST: "192.168.3.20"
+  CHROMA_PORT: "8000"
+  CHROMA_SSL: "false"
+
+  # RabbitMQ 접속 정보 (비밀번호 제외)
+  RABBITMQ_HOST: "rabbitmq-headless.rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_VIRTUAL_HOST: "/"
+  RABBITMQ_HEARTBEAT_SECONDS: "60"
+  RABBITMQ_BLOCKED_CONNECTION_TIMEOUT_SECONDS: "30"
+  RABBITMQ_MAX_RETRY_COUNT: "3"
+
+  # RabbitMQ Exchange/Queue 이름
+  EXCHANGE_APP_TO_RAG: "x.app2rag.direct"
+  EXCHANGE_RAG_TO_APP: "x.rag2app.direct"
+
+  # 문서 처리
+  CHUNKING_BACKEND: "langchain"
+  PDF_CHUNKING_STRATEGY: "semantic"
+  DEFAULT_TOP_K: "5"
+  DEFAULT_CHUNK_SIZE: "900"
+  DEFAULT_CHUNK_OVERLAP: "120"
+  MAX_UPLOAD_BYTES: "10485760"
+
+  # OCR
+  PDF_OCR_ENABLED: "true"
+  PDF_OCR_LANGUAGES: "kor"
+  PDF_OCR_DPI: "300"
