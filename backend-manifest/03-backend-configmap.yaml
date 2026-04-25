@@ -9,3 +9,4 @@ data:
   DB_HOST: "192.168.3.10"
   DB_PORT: "3306"
   GOOGLE_REDIRECT_URI: "https://capstone.studylink.click/api/integrations/google/callback"
+  S3_PREFIX: "rag/client"
