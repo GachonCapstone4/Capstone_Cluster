@@ -1,8 +1,53 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: dev-readonly-role
+  name: devteam-cluster-readonly
 rules:
-  - apiGroups: ["", "apps", "batch", "extensions"]
-    resources: ["pods", "pods/log", "deployments", "replicasets", "statefulsets", "daemonsets", "services", "endpoints", "nodes", "events", "configmaps"]
+  - apiGroups: [""]
+    resources:
+      - pods
+      - pods/log
+      - pods/status
+      - services
+      - endpoints
+      - configmaps
+      - persistentvolumeclaims
+      - persistentvolumes      # 전역 리소스
+      - nodes                  # 노드 조회만 허용
+      - namespaces             # 네임스페이스 목록 조회
+      - events
+      - replicationcontrollers
     verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - replicasets
+      - statefulsets
+      - daemonsets
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["autoscaling"]
+    resources:
+      - horizontalpodautoscalers
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - ingresses
+      - networkpolicies
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["storage.k8s.io"]
+    resources:
+      - storageclasses
+    verbs: ["get", "list", "watch"]
+
+  # ❌ 아래는 명시적으로 포함하지 않음 (차단)
+  # secrets, delete, patch, update, create(exec 제외), deletecollection

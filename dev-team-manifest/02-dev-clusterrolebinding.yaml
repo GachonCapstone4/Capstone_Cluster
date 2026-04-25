@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: dev-readonly-binding
+  name: devteam-cluster-readonly-binding
 subjects:
   - kind: ServiceAccount
     name: dev-team
-    namespace: devteam
+    namespace: devteam        # SA는 devteam에 있지만 전역에 바인딩
 roleRef:
   kind: ClusterRole
-  name: dev-readonly-role
   apiGroup: rbac.authorization.k8s.io
+  name: devteam-cluster-readonly

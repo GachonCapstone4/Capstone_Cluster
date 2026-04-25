@@ -17,9 +17,9 @@ data:
 
   # Embedding
   EMBEDDING_API_BASE_URL: "http://cellm.gachon.ac.kr:8000/v1"
-  EMBEDDING_MODEL: "text-embedding-3-small"
+  EMBEDDING_MODEL: "embedding"
   EMBEDDING_BACKEND: "embedding_api"
-  EMBEDDING_DIMENSIONS: "384"
+  EMBEDDING_DIMENSIONS: "768"
 
   # VectorDB (ChromaDB HTTP 모드 필수)
   VECTOR_BACKEND: "chroma_http"
