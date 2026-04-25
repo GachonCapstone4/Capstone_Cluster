@@ -5,7 +5,7 @@ metadata:
   namespace: sse
 spec:
   selector:
-    app: sse-service
+    app: sse
   ports:
     - protocol: TCP
       port: 80

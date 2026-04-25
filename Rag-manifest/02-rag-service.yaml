@@ -5,7 +5,7 @@ metadata:
   namespace: rag
 spec:
   selector:
-    app: rag-service
+    app: rag
   ports:
     - protocol: TCP
       port: 80
