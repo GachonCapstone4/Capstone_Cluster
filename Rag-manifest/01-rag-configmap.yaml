@@ -16,7 +16,7 @@ data:
   LLM_API_TIMEOUT_SECONDS: "60"
 
   # Embedding
-  EMBEDDING_API_BASE_URL: "https://api.anthropic.com/v1/messages"
+  EMBEDDING_API_BASE_URL: "http://cellm.gachon.ac.kr:8000/v1"
   EMBEDDING_MODEL: "text-embedding-3-small"
   EMBEDDING_BACKEND: "embedding_api"
   EMBEDDING_DIMENSIONS: "384"
