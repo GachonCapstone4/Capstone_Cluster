@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: devteam-cluster-readonly
+  name: devteam-cluster
 rules:
   - apiGroups: [""]
     resources:
@@ -25,7 +25,7 @@ rules:
       - replicasets
       - statefulsets
       - daemonsets
-    verbs: ["get", "list", "watch"]
+    verbs: ["get", "list", "watch", "update", "patch"]
 
   - apiGroups: ["autoscaling"]
     resources:
@@ -50,4 +50,4 @@ rules:
     verbs: ["get", "list", "watch"]
 
   # ❌ 아래는 명시적으로 포함하지 않음 (차단)
-  # secrets, delete, patch, update, create(exec 제외), deletecollection
+  # secrets, delete,  create(exec 제외), deletecollection
