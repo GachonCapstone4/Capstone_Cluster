@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: devteam-cluster-readonly-binding
+  name: devteam-cluster-binding
 subjects:
   - kind: ServiceAccount
     name: dev-team
@@ -9,4 +9,4 @@ subjects:
 roleRef:
   kind: ClusterRole
   apiGroup: rbac.authorization.k8s.io
-  name: devteam-cluster-readonly
+  name: devteam-cluster

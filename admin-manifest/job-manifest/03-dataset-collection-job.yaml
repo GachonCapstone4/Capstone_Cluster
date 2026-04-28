@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dataset-collection-job
+  namespace: admin
+  annotations:
+    argocd.argoproj.io/sync-options: "Prune=false"
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        job-name: dataset-collection-job
+    spec:
+      containers:
+        - name: dataset-batch
+          image: 390403881443.dkr.ecr.ap-northeast-2.amazonaws.com/capstone/ecr:dataset-batch-latest
+          command: ["python", "dataset_batch.py"]
+          envFrom:
+            - configMapRef:
+                name: job-configmap
+            - secretRef:
+                name: job-secret
+      restartPolicy: Never
