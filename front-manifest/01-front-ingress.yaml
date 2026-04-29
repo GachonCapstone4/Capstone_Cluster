@@ -2,8 +2,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: admin-ingress
-  namespace: admin
+  name: front-ingress
+  namespace: front
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-route53"
     # ── 기본 설정 ──────────────────────────────────────────
@@ -11,29 +11,25 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
-    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/24,192.168.2.0/24"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      add_header 'Access-Control-Allow-Private-Network' 'true';
 
 
     # ── App Pod: Least Connection ──────────────────────────
     nginx.ingress.kubernetes.io/upstream-hash-by: ""    # 비활성 (RR or LeastConn)
     nginx.ingress.kubernetes.io/load-balance: "ewma"    # ewma = 가중 최소연결 (LeastConn 대체)
-
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - admin.studylink.click
+        - capstone.studylink.click
       secretName: capstone-tls-prod
   rules:
-    - host: admin.studylink.click
+    - host: capstone.studylink.click
       http:
         paths:
-          - path: /api/admin/
+          - path: /
             pathType: Prefix
             backend:
               service:
-                name: admin-service      # App Pod 서비스
+                name: front-service      # App Pod 서비스
                 port:
-                  number: 8080
+                  number: 80

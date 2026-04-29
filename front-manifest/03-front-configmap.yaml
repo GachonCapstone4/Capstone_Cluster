@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: front-configmap
+  namespace: front
+data:
+  VITE_API_BASE_URL: "https://capstone.studylink.click"
+  VITE_SSE_BASE_URL: "https://capstone.studylink.click"
+  VITE_ADMIN_API_BASE_URL: "https://admin.studylink.click"
