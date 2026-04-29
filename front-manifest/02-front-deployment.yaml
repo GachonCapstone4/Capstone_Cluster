@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-web
+  namespace: front
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front
+  template:
+    metadata:
+      labels:
+        app: front
+    spec:
+      containers:
+        - name: front-web
+          image: suhannugul/capstonefront:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "10Mi"
+            limits:
+              memory: "256Mi"
+#          envFrom:
+#            - secretRef:
+#                name: backend-secret
+#            - configMapRef:
+#                name: backend-configmap
