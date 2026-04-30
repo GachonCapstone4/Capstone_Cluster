@@ -4,14 +4,15 @@ metadata:
   name: job-configmap
   namespace: admin
 data:
-  RABBITMQ_HOST: "192.168.2.20"
-  RABBITMQ_PORT: "30672"
+  RABBITMQ_HOST: "rabbitmq-headless.rabbitmq"
+  RABBITMQ_PORT: "5672"
   controlplane: "192.168.2.10"
   workernode-1: "192.168.2.20"
   workernode-2: "192.168.2.30"
   GATEWAY_IP: "192.168.2.1"
   DB_HOST: "192.168.3.10"
   DB_PORT: "3306"
+  DB_NAME: "email_agent"
   AWS_REGION: "ap-northeast-2"
   S3_BUCKET: "capstone-gachon"
   S3_DATASET_KEY: "dataset/dataset_new.csv"
