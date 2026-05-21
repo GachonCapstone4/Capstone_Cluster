@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: software-configmap
+  namespace: software
+data:
+  DB_URL: "jdbc:mysql://192.168.3.10:3306/aidoc"
+  DB_USERNAME: "capstone"
+
