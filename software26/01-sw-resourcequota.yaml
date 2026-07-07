@@ -6,10 +6,10 @@ metadata:
 spec:
   hard:
     # 1. 컴퓨팅 자원 제한 (모든 Pod의 requests/limits 합산 기준)
-    requests.memory: 500Mi        # requests.memory 합이 4GiB 이하이어야 함
-    limits.memory: 1Gi          # limits.memory 합이 8GiB 이하이어야 함
+    requests.memory: 400Mi        # requests.memory 합이 400MB 이하이어야 함
+    limits.memory: 800Mi          # limits.memory 합이 800MB 이하이어야 함
 
     # 2. 오브젝트 개수 제한 (선택 사항)
-    pods: "3"                  # Pod는 최대 10개까지만 생성 가능
-    services: "2"               # Service는 최대 5개까지만 생성 가능
-    persistentvolumeclaims: "1" # PVC는 최대 4개까지만 생성 가능
+    pods: "3"                  # Pod는 최대 3개까지만 생성 가능
+    services: "2"               # Service는 최대 2개까지만 생성 가능
+    persistentvolumeclaims: "1" # PVC는 최대 1개까지만 생성 가능

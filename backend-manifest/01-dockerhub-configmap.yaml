@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: dockerhub-configmap
-  namespace: backend
+  namespace: maily
 data:
   IMAGE: "suhannugul/email-agent:latest"
   REGISTRY: "https://index.docker.io/v1/"

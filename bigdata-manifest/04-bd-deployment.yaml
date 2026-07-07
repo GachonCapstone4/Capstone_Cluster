@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bigdata-server
+  namespace: bigdata
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bigdata
+  template:
+    metadata:
+      labels:
+        app: bigdata
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: bigdata
+          image: suhannugul/bigdata:latest
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: "128Mi"
+            limits:
+              memory: "500Mi"
+          envFrom:
+            - secretRef:
+                name: bigdata-secret
+            - configMapRef:
+                name: bigdata-configmap

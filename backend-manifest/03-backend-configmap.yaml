@@ -2,11 +2,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: backend-configmap
-  namespace: backend
+  namespace: maily
 data:
   RABBITMQ_HOST: "rabbitmq-headless.rabbitmq"
   RABBITMQ_PORT: "5672"
-  DB_HOST: "192.168.3.10"
+  DB_HOST: "mariadb-headless.database.svc.cluster.local"
   DB_PORT: "3306"
   APP_FRONTEND_BASE_URL: "https://capstone.studylink.click"
   APP_FRONTEND_ALLOWED_ORIGINS: "https://capstone.studylink.click, maily://app"

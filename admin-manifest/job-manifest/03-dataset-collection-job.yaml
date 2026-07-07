@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: dataset-collection-job
-  namespace: admin
+  namespace: maily
   annotations:
     argocd.argoproj.io/sync-options: "Prune=false"
 spec:

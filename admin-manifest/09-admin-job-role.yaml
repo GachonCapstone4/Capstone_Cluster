@@ -3,7 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: job-runner-role
-  namespace: admin
+  namespace: maily
 rules:
   # Job 생성 / 조회 / 삭제 (필수)
   - apiGroups: ["batch"]

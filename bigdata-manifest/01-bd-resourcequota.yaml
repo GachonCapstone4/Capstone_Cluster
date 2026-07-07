@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: bigdata-quota
+  namespace: bigdata # 제한하고 싶은 네임스페이스 지정
+spec:
+  hard:
+    # 1. 컴퓨팅 자원 제한 (모든 Pod의 requests/limits 합산 기준)
+    requests.memory: 200Mi        # requests.memory 합이 4GiB 이하이어야 함
+    limits.memory: 500Mi          # limits.memory 합이 8GiB 이하이어야 함
+
+    # 2. 오브젝트 개수 제한 (선택 사항)
+    pods: "2"                  # Pod는 최대 10개까지만 생성 가능
+    services: "1"               # Service는 최대 5개까지만 생성 가능
+    persistentvolumeclaims: "1" # PVC는 최대 4개까지만 생성 가능
