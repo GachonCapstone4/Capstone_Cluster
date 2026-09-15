@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: admin-server
-  namespace: admin
+  namespace: maily
 spec:
   revisionHistoryLimit: 5
   replicas: 1

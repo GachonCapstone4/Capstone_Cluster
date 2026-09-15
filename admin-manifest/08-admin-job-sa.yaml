@@ -3,4 +3,4 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: job-runner-sa
-  namespace: admin
+  namespace: maily

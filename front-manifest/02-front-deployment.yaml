@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: front-web
-  namespace: front
+  namespace: maily
 spec:
   revisionHistoryLimit: 3
   replicas: 1

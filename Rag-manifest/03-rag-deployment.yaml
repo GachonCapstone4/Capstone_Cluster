@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rag
-  namespace: rag
+  namespace: maily
 spec:
   revisionHistoryLimit: 3
   replicas: 1

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: backend-configmap
-  namespace: backend
+  namespace: maily
 data:
   RABBITMQ_HOST: "rabbitmq-headless.rabbitmq"
   RABBITMQ_PORT: "5672"
