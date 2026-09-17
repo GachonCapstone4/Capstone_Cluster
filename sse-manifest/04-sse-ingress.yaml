@@ -11,11 +11,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-buffering: "off"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header Connection "";
-      proxy_http_version 1.1;
-      chunked_transfer_encoding off;
-      proxy_cache off;
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"   # 기본값이라 생략 가능
 
     # ── App Pod: Least Connection ──────────────────────────
     nginx.ingress.kubernetes.io/upstream-hash-by: ""    # 비활성 (RR or LeastConn)
