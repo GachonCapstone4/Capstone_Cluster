@@ -1,0 +1,179 @@
+# kubectl get -o yaml 로 2026-10-01 클러스터에서 추출 (status/uid/managedFields 등 런타임 필드 제거)
+# Secret(mariadb-secret)은 secret/00-mariadb-secret.yaml 참고 (git 제외)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mariadb
+  namespace: database
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: mariadb
+  serviceName: mariadb-headless
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MYSQL_ROOT_PASSWORD
+              name: mariadb-secret
+        - name: MYSQL_REPLICATION_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: MYSQL_REPLICATION_PASSWORD
+              name: mariadb-secret
+        image: mariadb@sha256:ab1c3dd381940233af12512b97d47b508fd3a0f17fbe3ba388739b7bc17cbc0b   # 12.3.3 고정 (latest는 13.x로 이동함)
+        imagePullPolicy: Always
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - bash
+              - -c
+              - |
+                set -e
+                ordinal="${POD_NAME##*-}"
+
+                until mariadb-admin ping -uroot -p"${MYSQL_ROOT_PASSWORD}" --silent 2>/dev/null; do
+                  sleep 2
+                done
+
+                if [[ "$ordinal" == "0" ]]; then
+                  mariadb -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "
+                    CREATE USER IF NOT EXISTS 'repl'@'%' IDENTIFIED BY '${MYSQL_REPLICATION_PASSWORD}';
+                    GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+                    FLUSH PRIVILEGES;"
+                else
+                  # read_only는 부트스트랩(시스템 테이블 생성)이 쓰기라서 정적 cnf에 넣으면
+                  # 최초 기동이 막힌다. 서버가 뜬 뒤 동적으로 설정한다.
+                  mariadb -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "SET GLOBAL read_only='NO_LOCK_NO_ADMIN';"
+                  RUNNING=$(mariadb -uroot -p"${MYSQL_ROOT_PASSWORD}" -N -e "SHOW SLAVE STATUS\G" 2>/dev/null | grep -c "Slave_IO_Running: Yes" || true)
+                  if [[ "$RUNNING" -eq 0 ]]; then
+                    mariadb -uroot -p"${MYSQL_ROOT_PASSWORD}" -e "
+                      STOP SLAVE;
+                      CHANGE MASTER TO
+                        MASTER_HOST='mariadb-0.mariadb-headless.database.svc.cluster.local',
+                        MASTER_USER='repl',
+                        MASTER_PASSWORD='${MYSQL_REPLICATION_PASSWORD}',
+                        MASTER_USE_GTID=slave_pos;
+                      START SLAVE;"
+                  fi
+                fi
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - mariadb-admin ping -u root -p${MYSQL_ROOT_PASSWORD}
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: mariadb
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - mariadb-admin ping -u root -p${MYSQL_ROOT_PASSWORD}
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: mariadb-data
+        - mountPath: /etc/mysql/conf.d/
+          name: conf-d
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - bash
+        - -c
+        - |
+          set -ex
+          ordinal="${POD_NAME##*-}"
+          if [[ "$ordinal" == "0" ]]; then
+            cp /mnt/config-map/primary.cnf /mnt/conf.d/custom.cnf
+          else
+            cp /mnt/config-map/replica.cnf /mnt/conf.d/custom.cnf
+          fi
+          # [mysqld] 섹션 안에 삽입해야 한다. 파일 끝에 그냥 append하면
+          # [client] 섹션 소속이 되어 mariadb-admin/mariadb 클라이언트가
+          # "unknown variable 'server-id'"로 죽어 postStart ping 루프가 멈추지 않는다.
+          sed -i "/^\[mysqld\]/a server-id=$((ordinal + 1))" /mnt/conf.d/custom.cnf
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        image: mariadb@sha256:ab1c3dd381940233af12512b97d47b508fd3a0f17fbe3ba388739b7bc17cbc0b   # 12.3.3 고정 (latest는 13.x로 이동함)
+        imagePullPolicy: Always
+        name: init-config
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /mnt/config-map
+          name: mariadb-config
+        - mountPath: /mnt/conf.d
+          name: conf-d
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: mariadb-config
+        name: mariadb-config
+      - emptyDir: {}
+        name: conf-d
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        app: mariadb
+      name: mariadb-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      storageClassName: ''
+      volumeMode: Filesystem

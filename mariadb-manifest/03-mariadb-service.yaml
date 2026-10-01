@@ -1,0 +1,67 @@
+# kubectl get -o yaml 로 2026-10-01 클러스터에서 추출 (status/uid/managedFields 등 런타임 필드 제거)
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mariadb
+  name: mariadb-headless
+  namespace: database
+spec:
+  clusterIP: None
+  ports:
+  - name: mysql
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mariadb
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mariadb
+    readonly: 'true'
+  name: mariadb-read
+  namespace: database
+spec:
+  clusterIP: None
+  ports:
+  - name: mysql
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mariadb
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-external-write
+  namespace: database
+spec:
+  ports:
+  - nodePort: 31306
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    statefulset.kubernetes.io/pod-name: mariadb-0
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-external-read
+  namespace: database
+spec:
+  ports:
+  - nodePort: 31307
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    statefulset.kubernetes.io/pod-name: mariadb-1
+  type: NodePort
