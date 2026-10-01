@@ -1,0 +1,67 @@
+# syntax=docker/dockerfile:1
+# ============================================================
+# AI 추론 서버 amd64 이미지 (클러스터 노드용)
+# - AI 레포(GachonCapstone4/AI)는 수정하지 않고, 그 소스를 빌드 컨텍스트로 사용
+# - 원본 Dockerfile과의 차이: --platform=linux/amd64, torch CPU 휠,
+#   LLM 타임아웃 빌드 패치(LLM_TIMEOUT_SECONDS, 클러스터 Ollama용)
+#
+# 빌드 (컨텍스트 = AI 레포 체크아웃 경로):
+#   docker buildx build --platform linux/amd64 \
+#     -f ai-manifest/build/Dockerfile.amd64 \
+#     -t suhannugul/capstoneai:amd64-<AI커밋sha> --push <AI레포경로>
+# ============================================================
+
+# 1단계: Builder Stage
+FROM --platform=linux/amd64 python:3.11-slim-bookworm AS builder
+
+ARG TORCH_VERSION=2.3.0
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# torch를 CPU 인덱스에서 먼저 설치 → requirements의 torch==2.3.0이 2.3.0+cpu로 충족되어
+# 기본 PyPI의 CUDA 휠(수 GB)이 설치되지 않음
+COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --index-url https://download.pytorch.org/whl/cpu torch==${TORCH_VERSION} && \
+    pip install -r requirements.txt
+
+# ------------------------------------------------------------
+# 2단계: Final Stage (원본 Dockerfile과 동일)
+FROM --platform=linux/amd64 python:3.11-slim-bookworm AS runner
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONPATH=/app:/app/src \
+    MODEL_SOURCE=s3 \
+    MODEL_LOCAL_CACHE_DIR=/app/.cache/model-cache
+
+WORKDIR /app
+
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY api/ ./api/
+COPY src/ ./src/
+COPY messaging/ ./messaging/
+RUN mkdir -p /app/.cache/model-cache
+
+# [빌드 패치] llm_client.py의 LLM 읽기 타임아웃 60초 하드코딩 → LLM_TIMEOUT_SECONDS 환경변수(기본 180)
+# 클러스터 Ollama(CPU 추론)는 짧은 메일도 약 36초, 긴 메일은 수 분이 걸려 60초로는 부족함
+# 원본 코드가 바뀌어 패턴이 없거나 패치가 적용되지 않으면 빌드를 실패시킴 (조용히 넘어가지 않도록)
+RUN set -e; f=api/services/llm_client.py; \
+    grep -q 'timeout=(5, 60),' "$f" || { echo "PATCH FAILED: 'timeout=(5, 60),' not found in $f" >&2; exit 1; }; \
+    sed -i 's/timeout=(5, 60),/timeout=(5, float(__import__("os").getenv("LLM_TIMEOUT_SECONDS", "180"))),/' "$f"; \
+    grep -q 'LLM_TIMEOUT_SECONDS' "$f" && python -m py_compile "$f"
+
+EXPOSE 8080
+
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8080"]

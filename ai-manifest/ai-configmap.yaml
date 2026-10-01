@@ -1,17 +1,39 @@
 apiVersion: v1
-kind: Pod
+kind: ConfigMap
 metadata:
-  name: $title$
-  labels:
-    role: $title$
-spec:
-  containers:
-    - name: $title$
-      image: $nginx$
-      imagePullPolicy: IfNotPresent
-      ports:
-        - name: $title$
-          containerPort: $80$
-          protocol: $TCP$
-  restartPolicy: Always
-  $END$
+  name: ai-configmap
+  namespace: maily
+data:
+  APP_ENV: "prod"
+  LOG_LEVEL: "INFO"
+  API_HOST: "0.0.0.0"
+  API_PORT: "8080"                         # Dockerfile CMD 고정값과 일치 (앱은 이 값을 쓰지 않음)
+
+  AWS_REGION: "ap-northeast-2"
+  S3_DATASET_BUCKET: "capstone-gachon"
+  S3_DATASET_PREFIX: "datasets"
+  S3_MODEL_BUCKET: "capstone-gachon"
+  S3_MODEL_PREFIX: "models"
+
+  MODEL_SOURCE: "s3"
+  # 반드시 고정값. 비우면 latest.json(검증 전 최신 학습본)을 로드함
+  # switch 성공 시 이 값을 올려서 커밋 → 재기동 후에도 버전 유지
+  ACTIVE_MODEL_VERSION: "training-final-004"   # S3 models/에 존재 확인 (2026-10-01, latest.json과 동일)
+  MODEL_LOCAL_CACHE_DIR: "/app/.cache/model-cache"
+
+  # LLM = 클러스터 내 Ollama (ai-infra/ollama, OpenAI 호환 /v1)
+  # provider "openai" + OPENAI_BASE_URL 조합으로 사용 (Ollama는 인증 없음 → OPENAI_API_KEY는 Secret에 더미값)
+  LLM_PROVIDER: "openai"
+  OPENAI_BASE_URL: "http://ollama-service.ai-infra.svc.cluster.local:11434/v1"
+  OPENAI_MODEL: "qwen2.5:3b-instruct"      # RAG와 공유하는 모델 (ollama-manifest initContainer에서 pull)
+  LLM_MAX_INPUT_CHARS: "3000"              # CPU 추론(prompt 약 9.5 tok/s) + Ollama context 4096 기준
+  LLM_MAX_OUTPUT_TOKENS: "400"             # summarize는 코드에서 400 고정, 기본값도 맞춤
+  LLM_TIMEOUT_SECONDS: "180"               # Dockerfile.amd64 빌드 패치로 읽음 (원본은 60초 하드코딩)
+
+  TRAINING_SAFE_MODE: "true"
+
+  # CPU 서빙 튜닝 (원본엔 없지만 온프렘에서 필요)
+  OMP_NUM_THREADS: "2"
+  MKL_NUM_THREADS: "2"
+  TOKENIZERS_PARALLELISM: "false"
+  HF_HOME: "/app/.cache/hf"

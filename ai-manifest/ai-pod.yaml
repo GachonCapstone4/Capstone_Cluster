@@ -1,17 +1,74 @@
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: $title$
-  labels:
-    role: $title$
+  name: ai-inference
+  namespace: maily
 spec:
-  containers:
-    - name: $title$
-      image: $nginx$
-      imagePullPolicy: IfNotPresent
-      ports:
-        - name: $title$
-          containerPort: $80$
-          protocol: $TCP$
-  restartPolicy: Always
-  $END$
+  replicas: 1               # q.2ai.deployment를 파드 하나만 소비 → 2개 이상이면 모델 버전이 섞임
+  strategy:
+    type: RollingUpdate     # 캐시가 emptyDir라 노드/RWO 제약 없음
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ai-inference
+  template:
+    metadata:
+      labels:
+        app: ai-inference
+      # prometheus.io/* annotation은 일부러 두지 않음
+      # → spring-boot-actuator job과 중복 수집 방지, 'ai-inference' job이 전담
+    spec:
+      terminationGracePeriodSeconds: 60   # 처리 중인 메시지 ack 여유
+      containers:
+        - name: ai
+          # 클러스터 레포에서 빌드한 amd64 이미지 (ai-manifest/build 참고)
+          # 태그 = AI 레포(GachonCapstone4/AI) 커밋 sha, latest 사용 금지
+          image: suhannugul/capstoneai:amd64-19edfd2
+          ports:
+            - name: http
+              containerPort: 8080       # Dockerfile CMD에 8080 고정
+          envFrom:
+            - configMapRef:
+                name: ai-configmap
+            - secretRef:
+                name: ai-secret
+          volumeMounts:
+            - name: cache
+              mountPath: /app/.cache      # 모델 캐시 + HF 캐시
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1536Mi
+            limits:
+              cpu: "2"
+              memory: 3Gi                 # staging 모델 동시 적재 시 약 2배
+          startupProbe:
+            httpGet: { path: /health, port: 8080 }
+            failureThreshold: 60          # S3 다운로드 포함, 최대 5분
+            periodSeconds: 5
+          readinessProbe:
+            httpGet: { path: /health, port: 8080 }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 8080 }
+            periodSeconds: 30
+            failureThreshold: 3
+      volumes:
+        - name: cache
+          emptyDir:
+            sizeLimit: 3Gi                # 원본은 S3, 재기동 시 재다운로드
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-inference
+  namespace: maily
+spec:
+  selector:
+    app: ai-inference
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080

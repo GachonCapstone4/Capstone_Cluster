@@ -1,9 +1,10 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: prometheus-deployment
+  name: prometheus-statefulset
   namespace: monitoring
 spec:
+  serviceName: ""
   replicas: 1
   selector:
     matchLabels:
@@ -35,4 +36,3 @@ spec:
         - name: data-volume
           persistentVolumeClaim:
             claimName: prometheus-pvc
-

@@ -1,0 +1,12 @@
+# 02-ollama-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-data-pvc
+  namespace: ai-infra
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 15Gi   # bge-m3 + 추후 채팅 LLM까지 같은 인스턴스에서 공유할 것을 전제로 여유있게

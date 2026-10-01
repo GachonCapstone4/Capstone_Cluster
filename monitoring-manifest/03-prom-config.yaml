@@ -115,12 +115,34 @@ data:
             target_label: pod
 
       # 6. AWS AI 서버 메트릭 수집 (VPN: 172.16.2.10)
+      #    컷오버 기간에 클러스터 파드와 비교용으로 유지, AWS 서버 종료 후 삭제
       - job_name: 'aws-ai-server'
         static_configs:
           - targets: ['172.16.2.10:8080']
             labels:
               instance: 'aws-ai-server'
         metrics_path: '/metrics'
+
+      # 6-1. 클러스터 AI 추론 서버 (maily/ai-inference)
+      - job_name: 'ai-inference'
+        metrics_path: '/metrics'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: ['maily']
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: ai-inference
+          - source_labels: [__meta_kubernetes_pod_container_port_number]
+            action: keep
+            regex: "8080"
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: pod
 
       # 7. Backend 서버 메트릭 수집
       - job_name: 'backend'

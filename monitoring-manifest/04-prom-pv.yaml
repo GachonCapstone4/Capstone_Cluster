@@ -8,5 +8,10 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: /data/prometheus-data # 실제 워커 노드에 생성될 디렉토리
+  storageClassName: ""
+  nfs:
+    server: 192.168.2.40
+    path: /srv/nfs/share/prometheus
+  claimRef:
+    name: prometheus-pvc
+    namespace: monitoring

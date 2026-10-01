@@ -1,0 +1,18 @@
+# chroma-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: chroma-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain   # Pod/PVC 삭제해도 벡터 데이터 보존
+  storageClassName: ""
+  nfs:
+    server: 192.168.2.40
+    path: /srv/nfs/share/chroma
+  claimRef:
+    name: chroma-data-chroma-0   # StatefulSet(chroma) replica 0의 volumeClaimTemplate이 생성하는 PVC 이름
+    namespace: database

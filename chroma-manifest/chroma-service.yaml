@@ -1,0 +1,14 @@
+# chroma-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: chroma-service
+  namespace: database
+spec:
+  selector:
+    app: chroma
+  clusterIP: None   # StatefulSet 안정적 DNS(chroma-0.chroma-service.maily)용 headless
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

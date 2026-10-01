@@ -1,0 +1,71 @@
+# 03-ollama-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: ai-infra
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate          # RWO PVC라 롤링 불가 (ai-inference와 동일한 제약)
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      # worker-2는 mariadb/chroma 등으로 메모리 limit이 이미 96%라 worker-1(여유 많음)에 고정 배치
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-1
+      # 최초 기동 시 임베딩 모델 + 채팅 모델을 미리 pull (인터넷 egress 필요, 다운로드 완료까지 시간 소요)
+      initContainers:
+        - name: pull-models
+          image: ollama/ollama:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              ollama serve &
+              pid=$!
+              until ollama list >/dev/null 2>&1; do sleep 1; done
+              ollama pull bge-m3
+              ollama pull qwen2.5:3b-instruct
+              kill $pid
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          ports:
+            - containerPort: 11434
+          env:
+            - name: OLLAMA_KEEP_ALIVE
+              value: "-1"          # 모델 상주 (언로드 후 첫 요청 콜드스타트 실측 78초 → ai 타임아웃 위험)
+            - name: OLLAMA_NUM_PARALLEL
+              value: "1"           # CPU 추론이라 병렬 처리 시 경합만 늘어남, ai/rag 요청은 순차 처리
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "3"
+              memory: "6Gi"
+          readinessProbe:
+            tcpSocket:
+              port: 11434
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 11434
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+      volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: ollama-data-pvc

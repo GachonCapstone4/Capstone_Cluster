@@ -114,7 +114,7 @@ spec:
         name: rabbitmq-data
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: rabbitmq-storage   # ② StorageClass 참조
+        storageClassName: ""   # 정적 NFS PV(rabbitmq-pv)와 바인딩
         resources:
           requests:
             storage: 5Gi

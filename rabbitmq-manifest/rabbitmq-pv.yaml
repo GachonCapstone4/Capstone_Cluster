@@ -1,0 +1,18 @@
+# rabbitmq-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rabbitmq-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain   # Pod 삭제 시 데이터 보존 (운영 필수)
+  storageClassName: ""
+  nfs:
+    server: 192.168.2.40
+    path: /srv/nfs/share/rabbitmq
+  claimRef:
+    name: rabbitmq-data-rabbitmq-0   # StatefulSet(rabbitmq) replica 0의 volumeClaimTemplate이 생성하는 PVC 이름
+    namespace: rabbitmq

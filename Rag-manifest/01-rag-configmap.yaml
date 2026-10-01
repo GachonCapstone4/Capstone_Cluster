@@ -11,19 +11,19 @@ data:
   MOCK_MODE: "false"
 
   # LLM
-  LLM_API_BASE_URL: "http://cellm.gachon.ac.kr:8000/v1"
-  LLM_CHAT_MODEL: "text"
-  LLM_API_TIMEOUT_SECONDS: "60"
+  LLM_API_BASE_URL: "http://ollama-service.ai-infra:11434/v1"
+  LLM_CHAT_MODEL: "qwen2.5:3b-instruct"
+  LLM_API_TIMEOUT_SECONDS: "180"
 
   # Embedding
-  EMBEDDING_API_BASE_URL: "http://cellm.gachon.ac.kr:8000/v1"
-  EMBEDDING_MODEL: "embedding"
+  EMBEDDING_API_BASE_URL: "http://ollama-service.ai-infra:11434/v1"
+  EMBEDDING_MODEL: "bge-m3"
   EMBEDDING_BACKEND: "embedding_api"
-  EMBEDDING_DIMENSIONS: "768"
+  EMBEDDING_DIMENSIONS: "1024"
 
   # VectorDB (ChromaDB HTTP 모드 필수)
   VECTOR_BACKEND: "chroma_http"
-  CHROMA_HOST: "192.168.3.20"
+  CHROMA_HOST: "chroma-service.database"
   CHROMA_PORT: "8000"
   CHROMA_SSL: "false"
 
