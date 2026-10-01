@@ -6,7 +6,7 @@ metadata:
 data:
   RABBITMQ_HOST: "rabbitmq-headless.rabbitmq"
   RABBITMQ_PORT: "5672"
-  DB_HOST: "mariadb-headless.database.svc.cluster.local"
+  DB_HOST: "mariadb-0.mariadb-headless.database.svc.cluster.local"   # 쓰기 가능한 primary 고정 (mariadb-1은 read-only 복제본)
   DB_PORT: "3306"
   APP_FRONTEND_BASE_URL: "https://capstone.studylink.click"
   APP_FRONTEND_ALLOWED_ORIGINS: "https://capstone.studylink.click, maily://app"
